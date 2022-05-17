@@ -1,0 +1,27 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.234.0/containers/docker-existing-dockerfile
+{
+	"name": "Existing Dockerfile",
+
+	"dockerFile": "Dockerfile",
+	"containerEnv": {
+		"GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}",
+		"GITHUB_USER": "${localEnv:GITHUB_USER}",
+		"GITHUB_EMAIL": "${localEnv:GITHUB_EMAIL}"
+	},
+	// Set *default* container specific settings.json values on container create.
+	"settings": {
+		"terminal.integrated.profiles.linux": {
+			"bash": {
+				"path": "/bin/bash"
+			}
+		}
+	},
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"juanblanco.solidity",
+		"ms-vscode.vscode-typescript-next",
+		"ms-vscode.js-debug-nightly",
+		"streetsidesoftware.code-spell-checker"
+	],
+}
