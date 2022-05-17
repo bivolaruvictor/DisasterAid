@@ -1,1 +1,10 @@
-<p>app-auth-button works!</p>
+<ng-container *ngIf="auth.isAuthenticated$ | async; else loggedOut">
+    <button (click)="auth.logout({ returnTo: document.location.origin })">
+      Log out
+    </button>
+    <app-user-profile></app-user-profile>
+  </ng-container>
+
+  <ng-template #loggedOut>
+    <button (click)="auth.loginWithPopup({ returnTo: document.location.origin })">Log in</button>
+  </ng-template>

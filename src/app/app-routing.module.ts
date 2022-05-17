@@ -4,8 +4,17 @@ import { AppAuthButtonComponent } from './app-auth-button/app-auth-button.compon
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+// Import the authentication guard
+import { AuthGuard } from '@auth0/auth0-angular';
+
 const routes: Routes = [
-  { path: 'profilePage', component:UserProfileComponent },
+  {
+    path: 'protected',
+    component: UserProfileComponent,
+
+    // Protect a route by registering the auth guard in the `canActivate` hook
+    canActivate: [AuthGuard],
+  },
 ];
 
 @NgModule({

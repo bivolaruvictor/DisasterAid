@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
+import { DOCUMENT } from '@angular/common';
 import {AppAuthButtonComponent} from '../app/app-auth-button/app-auth-button.component'
 import { AppRoutingModule } from './app-routing.module';
 
@@ -10,5 +11,7 @@ import { AppRoutingModule } from './app-routing.module';
 })
 export class AppComponent {
   title = 'DisasterAid';
-  constructor(public auth: AuthService) {}
+  constructor(@Inject(DOCUMENT) public document: Document, public auth: AuthService) {}
+
+  
 }
