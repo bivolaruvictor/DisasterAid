@@ -8,16 +8,20 @@ import { AuthModule } from '@auth0/auth0-angular';
 import { AppAuthButtonComponent } from './app-auth-button/app-auth-button.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NavbarComponent } from './navbar/navbar.component';
+import  {MdbCollapseModule} from 'mdb-angular-ui-kit/collapse'
 
 @NgModule({
   declarations: [
     AppComponent,
     AppAuthButtonComponent,
-    UserProfileComponent 
+    UserProfileComponent,
+    NavbarComponent 
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    MdbCollapseModule,
     AuthModule.forRoot({
       domain: 'dev-f86u9b27.us.auth0.com',
       clientId: 'P13X9oVqpmM5NT4EjBfAM5zsr7kjRf0t'
