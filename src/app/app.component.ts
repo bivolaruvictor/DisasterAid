@@ -3,6 +3,10 @@ import { AuthService } from '@auth0/auth0-angular';
 import { DOCUMENT } from '@angular/common';
 import {AppAuthButtonComponent} from '../app/app-auth-button/app-auth-button.component'
 import { AppRoutingModule } from './app-routing.module';
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { getFirestore } from "firebase/firestore";
+import data from '../../auth_config.json';
 
 @Component({
   selector: 'app-root',
@@ -15,3 +19,18 @@ export class AppComponent {
 
   
 }
+
+const firebaseConfig = {
+  apiKey: data.apiKey,
+  authDomain: data.authDomain,
+  projectId: data.projectId,
+  storageBucket: data.storageBucket,
+  messagingSenderId: data.messagingSenderId,
+  appId: data.appId,
+  measurementId: data.measurementId
+};
+
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getFirestore(app);
+
