@@ -6,6 +6,7 @@ import { UserProfileComponent } from '../user-profile/user-profile.component';
 @Component({
   selector: 'app-auth-button',
   templateUrl: './app-auth-button.component.html',
+  styleUrls: ['./app-auth-button.component.css']
 })
 export class AppAuthButtonComponent {
   // Inject the authentication service into your component through the constructor

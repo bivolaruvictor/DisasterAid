@@ -1,0 +1,35 @@
+.default-btn {
+    color: #ffffff;
+    border: none;
+    box-shadow: unset !important;
+    padding: 11px 35px;
+    transition: all 0.5s;
+    z-index: 1;
+    text-transform: capitalize;
+    border-radius: 30px;
+    background: #00a7f5;
+    display: inline-block;
+    cursor: pointer;
+    position: relative;
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .default-btn::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    border-radius: 30px;
+    z-index: -1;
+    background: linear-gradient(to bottom right, #ff416c, #fa4612);
+    transition: all 0.5s;
+  }
+  .default-btn:hover {
+    color: #ffffff;
+  }
+  .default-btn:hover::before {
+    opacity: 0;
+    visibility: hidden;
+  }
