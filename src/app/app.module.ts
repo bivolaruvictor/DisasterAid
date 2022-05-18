@@ -10,21 +10,24 @@ import { UserProfileComponent } from './user-profile/user-profile.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavbarComponent } from './navbar/navbar.component';
 import  {MdbCollapseModule} from 'mdb-angular-ui-kit/collapse'
+import data from '../../auth_config.json';
+import { MapComponent } from './map/map.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     AppAuthButtonComponent,
     UserProfileComponent,
-    NavbarComponent 
+    NavbarComponent,
+    MapComponent 
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     MdbCollapseModule,
     AuthModule.forRoot({
-      domain: 'dev-f86u9b27.us.auth0.com',
-      clientId: 'P13X9oVqpmM5NT4EjBfAM5zsr7kjRf0t'
+      domain : data.domain,
+      clientId: data.clientId,
     }),
     BrowserAnimationsModule,
   ],
