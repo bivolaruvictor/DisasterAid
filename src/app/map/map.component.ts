@@ -1,12 +1,31 @@
 import { Component, OnInit } from '@angular/core';
 import { Loader } from '@googlemaps/js-api-loader';
 import data from '../../../auth_config.json';
+import { collection, addDoc, getDocs, GeoPoint } from "firebase/firestore"; 
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { getFirestore } from "firebase/firestore";
+
+const firebaseConfig = {
+  apiKey: data.apiKey,
+  authDomain: data.authDomain,
+  projectId: data.projectId,
+  storageBucket: data.storageBucket,
+  messagingSenderId: data.messagingSenderId,
+  appId: data.appId,
+  measurementId: data.measurementId
+};
+
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getFirestore(app);
 
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
+
 export class MapComponent implements OnInit {
   title = 'map'
   
@@ -28,7 +47,25 @@ export class MapComponent implements OnInit {
   constructor() { }
 
   async ngOnInit(): Promise<void> {
-  
+
+    let position = new GeoPoint(44.439663, 26.096306)
+    try {
+      const docRef = await addDoc(collection(db, "BloodLocations"), {
+        Name: "Ada",
+        Position: position,
+        Age: 123
+      });
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+    
+    const querySnapshot = await getDocs(collection(db, "BloodLocations"));
+      querySnapshot.forEach((doc) => {
+      console.log(`${doc.id} => ${doc.data()}`); 
+});
+
+
     let loader = new Loader({
       apiKey: data.APIKEY,
       libraries: ['drawing', 'geometry', 'places', 'visualization']
@@ -136,7 +173,11 @@ export class MapComponent implements OnInit {
         });
         this.calculateAndDisplayRoute(circle.getCenter(), this.myLocationMarker, this.directionsService, this.directionsRenderer);
       });
+      let cent = new google.maps.LatLng(this.center)
+      this.calculateAndDisplayRoute(e.latLng, cent , this.directionsService, this.directionsRenderer);
     });
+
+
   }
   
 
