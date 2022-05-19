@@ -61,7 +61,7 @@ export class MapComponent implements OnInit {
     }
     
     const querySnapshot = await getDocs(collection(db, "BloodLocations"));
-      querySnapshot.forEach((doc) => {
+      querySnapshot.forEach((doc: any) => {
       console.log(`${doc.id} => ${doc.data()}`); 
 });
 
@@ -172,10 +172,7 @@ export class MapComponent implements OnInit {
           shouldFocus: false,
         });
         this.calculateAndDisplayRoute(circle.getCenter(), this.myLocationMarker, this.directionsService, this.directionsRenderer);
-      });
-      let cent = new google.maps.LatLng(this.center)
-      this.calculateAndDisplayRoute(e.latLng, cent , this.directionsService, this.directionsRenderer);
-    });
+      });});
 
 
   }
@@ -204,3 +201,4 @@ export class MapComponent implements OnInit {
       .catch((e) => window.alert("Directions request failed due to " + status));
   }
 }
+
