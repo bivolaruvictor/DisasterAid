@@ -48,22 +48,22 @@ export class MapComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
 
-    let position = new GeoPoint(44.439663, 26.096306)
-    try {
-      const docRef = await addDoc(collection(db, "BloodLocations"), {
-        Name: "Ada",
-        Position: position,
-        Age: 123
-      });
-      console.log("Document written with ID: ", docRef.id);
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
+  //   let position = new GeoPoint(44.439663, 26.096306)
+  //   try {
+  //     const docRef = await addDoc(collection(db, "BloodLocations"), {
+  //       Name: "Ada",
+  //       Position: position,
+  //       Age: 123
+  //     });
+  //     console.log("Document written with ID: ", docRef.id);
+  //   } catch (e) {
+  //     console.error("Error adding document: ", e);
+  //   }
     
-    const querySnapshot = await getDocs(collection(db, "BloodLocations"));
-      querySnapshot.forEach((doc: any) => {
-      console.log(`${doc.id} => ${doc.data()}`); 
-});
+  //   const querySnapshot = await getDocs(collection(db, "BloodLocations"));
+  //     querySnapshot.forEach((doc: any) => {
+  //     console.log(`${doc.id} => ${doc.data()}`); 
+  // });
 
 
     let loader = new Loader({
