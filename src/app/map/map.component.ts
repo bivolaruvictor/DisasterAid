@@ -15,9 +15,15 @@ export class MapComponent implements OnInit {
       icon: '../../assets/images/blood.png',
     }};
 
-    directionsRenderer: any
-    directionsService: any
-    center: any;
+  directionsRenderer: any
+  directionsService: any
+  center: any;
+
+
+  bloodNeededInfoWindow:any;
+
+  fireInfoWindow:any;
+
   constructor() { }
 
   async ngOnInit(): Promise<void> {
@@ -41,6 +47,14 @@ export class MapComponent implements OnInit {
       })
     })
 
+    this.bloodNeededInfoWindow = new google.maps.InfoWindow({
+      content: 'Blood Donnor Needed',
+    });
+  
+    this.fireInfoWindow = new google.maps.InfoWindow({
+      content: 'Caution Fire',
+    });
+
     this.directionsRenderer = new google.maps.DirectionsRenderer();
     this.directionsService = new google.maps.DirectionsService();
 
@@ -60,6 +74,7 @@ export class MapComponent implements OnInit {
         draggable: true,
         animation: google.maps.Animation.DROP,
         icon: this.icons['blood'].icon,
+        clickable: true,
       },
       circleOptions: {
         strokeColor: "#FF0000",
@@ -70,6 +85,7 @@ export class MapComponent implements OnInit {
         map,
         center: this.center,
         radius: 100,
+        clickable: true,
       },
     });
 
@@ -80,13 +96,36 @@ export class MapComponent implements OnInit {
       this.placeMarker(e.latLng, map);
       
     });
+
+
+    google.maps.event.addListener(drawingManager, 'markercomplete',  (marker: any) => {
+      google.maps.event.addListener(marker, 'click', (e:any) => {
+        this.bloodNeededInfoWindow.open({
+          anchor: marker,
+          map,
+          shouldFocus: false,
+        });
+        this.calculateAndDisplayRoute(e.latLng, this.center, this.directionsService, this.directionsRenderer);
+      });
+    });
+
+
+    google.maps.event.addListener(drawingManager, 'circlecomplete',  (circle: any) => {
+      google.maps.event.addListener(circle, 'click', (e:any) => {
+        this.fireInfoWindow.setPosition(circle.getCenter());
+        this.fireInfoWindow.open({
+          anchor: circle,
+          map,
+          shouldFocus: false,
+        });
+        this.calculateAndDisplayRoute(circle.getCenter(), this.center, this.directionsService, this.directionsRenderer);
+      });
+    });
   }
 
   placeMarker(latLng: google.maps.LatLng, map: google.maps.Map) {
 
-    const infowindow = new google.maps.InfoWindow({
-      content: 'Blood Donnor Needed',
-    });
+    
 
     let marker = new google.maps.Marker({
       position: latLng,
@@ -97,7 +136,7 @@ export class MapComponent implements OnInit {
     });
 
     marker.addListener("click", (e:any) => {
-      infowindow.open({
+      this.bloodNeededInfoWindow.open({
         anchor: marker,
         map,
         shouldFocus: false,
