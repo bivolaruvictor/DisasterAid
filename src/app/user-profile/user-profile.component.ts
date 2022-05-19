@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
+import { Auth0Client } from '@auth0/auth0-spa-js';
 import { DOCUMENT } from '@angular/common';
 import { MapComponent } from '../map/map.component';
 import { initializeApp } from "firebase/app";
@@ -24,7 +25,7 @@ const db = getFirestore(app);
   templateUrl: './user-profile.component.html'
 })
 export class UserProfileComponent implements OnInit{
-  profileJson: any;
+  profile: any;
   name : any;
   username : any;
   user : any;
@@ -35,24 +36,19 @@ export class UserProfileComponent implements OnInit{
   
   constructor(@Inject(DOCUMENT) public document: Document, public auth: AuthService) {}
     ngOnInit(): void {
-      this.auth.isAuthenticated$.subscribe(
-        (profile) => (this.profileJson = profile),
-      );
-      console.log(this.profileJson);
-      // let user = this.auth.user$;
-      // console.log(loginInfo);
-      this.auth.user$.subscribe(
-        (profile) => (this.user = profile),
-      );
-      // console.log(this.user.name); 
-      // const docRef = doc(db, "users", ); 
-      // const docSnap = await getDoc(docRef);
-      
-      // if(docSnap.exists()) {
-  
-      // } else {
+        this.auth.getUser().subscribe(
+          async (profile) => {
+            this.user = profile;
+            const docRef = doc(db, "users", ); 
+            const docSnap = await getDoc(docRef);
+            
+            if(docSnap.exists()) {
         
-      // }
+            } else {
+              
+            }
+          },
+        );
     }
     
   

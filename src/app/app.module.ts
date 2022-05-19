@@ -28,6 +28,7 @@ import { MapComponent } from './map/map.component';
     AuthModule.forRoot({
       domain : data.domain,
       clientId: data.clientId,
+      cacheLocation: 'localstorage'
     }),
     BrowserAnimationsModule,
   ],
