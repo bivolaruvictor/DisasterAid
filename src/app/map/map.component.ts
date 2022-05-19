@@ -18,6 +18,7 @@ export class MapComponent implements OnInit {
   directionsRenderer: any
   directionsService: any
   center: any;
+  myLocationMarker:any;
 
 
   bloodNeededInfoWindow:any;
@@ -43,9 +44,30 @@ export class MapComponent implements OnInit {
     const map = await loader.load().then(() => {
       return new google.maps.Map(mapElement, {
         center: this.center, 
-        zoom: 10
+        zoom: 16
       })
     })
+
+    navigator.geolocation.getCurrentPosition((position) => {  
+      let newPoint = new google.maps.LatLng(position.coords.latitude, 
+                                            position.coords.longitude);
+  
+
+
+      this.myLocationMarker = new google.maps.Marker({
+        position: newPoint,
+        map: map,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 10,
+          fillOpacity: 1,
+          strokeWeight: 2,
+          fillColor: '#5384ED',
+          strokeColor: '#ffffff',
+        }});
+      // Center the map on the new position
+      map.setCenter(newPoint);
+    }); 
 
     this.bloodNeededInfoWindow = new google.maps.InfoWindow({
       content: 'Blood Donnor Needed',
@@ -59,7 +81,6 @@ export class MapComponent implements OnInit {
     this.directionsService = new google.maps.DirectionsService();
 
     const drawingManager = new google.maps.drawing.DrawingManager({
-      drawingMode: google.maps.drawing.OverlayType.MARKER,
       drawingControl: true,
       drawingControlOptions: {
         position: google.maps.ControlPosition.TOP_CENTER,
@@ -91,11 +112,6 @@ export class MapComponent implements OnInit {
 
     drawingManager.setMap(map);
     this.directionsRenderer.setMap(map);
-
-    map.addListener("click", (e: any) => {
-      this.placeMarker(e.latLng, map);
-      
-    });
 
 
     google.maps.event.addListener(drawingManager, 'markercomplete',  (marker: any) => {
