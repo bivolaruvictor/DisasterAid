@@ -39,7 +39,6 @@ export class UserProfileComponent implements OnInit{
         this.auth.getUser().subscribe(
           async (profile) => { 
             this.user = profile;
-            console.log(this.user);
             const docRef = doc(db, "users", this.user.email); 
             const docSnap = await getDoc(docRef);
             

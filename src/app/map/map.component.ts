@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Loader } from '@googlemaps/js-api-loader';
 import data from '../../../auth_config.json';
-import { collection, addDoc, getDocs, GeoPoint } from "firebase/firestore"; 
+import { collection, addDoc, getDocs, GeoPoint, setDoc, doc, getDoc } from "firebase/firestore"; 
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
+import { AuthService } from '@auth0/auth0-angular';
 
 const firebaseConfig = {
   apiKey: data.apiKey,
@@ -39,12 +40,13 @@ export class MapComponent implements OnInit {
   center: any;
   myLocationMarker:any;
 
+  currentUser : any;
 
   bloodNeededInfoWindow:any;
 
   fireInfoWindow:any;
 
-  constructor() { }
+  constructor(public auth: AuthService) { }
 
   async ngOnInit(): Promise<void> {
 
@@ -151,7 +153,24 @@ export class MapComponent implements OnInit {
     this.directionsRenderer.setMap(map);
 
 
-    google.maps.event.addListener(drawingManager, 'markercomplete',  (marker: any) => {
+    google.maps.event.addListener(drawingManager, 'markercomplete',  async (marker: any) => {
+      this.auth.getUser().subscribe(
+        async (profile) => { 
+          this.currentUser = profile;
+          
+          const userRef = doc(db, "users", this.currentUser.email);
+          const userDetails = await getDoc(userRef);
+          
+          let userData = userDetails.data();
+
+          //save blood points
+          await addDoc(collection(db, "BloodLocations"), {
+            location: [marker.getPosition().lat() , marker.getPosition().lng()],
+            bloodType: userData?.bloodType
+          });
+            
+          },
+      );   
       google.maps.event.addListener(marker, 'click', (e:any) => {
         this.bloodNeededInfoWindow.open({
           anchor: marker,
