@@ -4,7 +4,7 @@ import { Auth0Client } from '@auth0/auth0-spa-js';
 import { DOCUMENT } from '@angular/common';
 import { MapComponent } from '../map/map.component';
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 import data from '../../../auth_config.json';
 
 const firebaseConfig = {
@@ -37,20 +37,28 @@ export class UserProfileComponent implements OnInit{
   constructor(@Inject(DOCUMENT) public document: Document, public auth: AuthService) {}
     ngOnInit(): void {
         this.auth.getUser().subscribe(
-          async (profile) => {
+          async (profile) => { 
             this.user = profile;
-            const docRef = doc(db, "users", ); 
+            console.log(this.user);
+            const docRef = doc(db, "users", this.user.email); 
             const docSnap = await getDoc(docRef);
             
-            if(docSnap.exists()) {
-        
+             if(docSnap.exists()) {
+              console.log("l am gasit")
             } else {
-              
+              await setDoc(doc(db,"users", this.user.email), {
+                email: this.user.email,
+                name: this.user.name,
+                username: "blank",
+                bloodType: "blank",
+                phone : "blank",
+                address : "blank"
+              });
+              console.log("mai incearca")
             }
           },
         );
     }
-    
   
 }
 
