@@ -49,13 +49,13 @@ export class MapComponent implements OnInit {
     })
 
     navigator.geolocation.getCurrentPosition((position) => {  
-      let newPoint = new google.maps.LatLng(position.coords.latitude, 
+      this.myLocationMarker = new google.maps.LatLng(position.coords.latitude, 
                                             position.coords.longitude);
   
 
 
-      this.myLocationMarker = new google.maps.Marker({
-        position: newPoint,
+        let newPoint = new google.maps.Marker({
+        position: this.myLocationMarker,
         map: map,
         icon: {
           path: google.maps.SymbolPath.CIRCLE,
@@ -66,7 +66,7 @@ export class MapComponent implements OnInit {
           strokeColor: '#ffffff',
         }});
       // Center the map on the new position
-      map.setCenter(newPoint);
+      map.setCenter(this.myLocationMarker);
     }); 
 
     this.bloodNeededInfoWindow = new google.maps.InfoWindow({
@@ -121,7 +121,7 @@ export class MapComponent implements OnInit {
           map,
           shouldFocus: false,
         });
-        this.calculateAndDisplayRoute(e.latLng, this.center, this.directionsService, this.directionsRenderer);
+        this.calculateAndDisplayRoute(e.latLng, this.myLocationMarker, this.directionsService, this.directionsRenderer);
       });
     });
 
@@ -134,31 +134,8 @@ export class MapComponent implements OnInit {
           map,
           shouldFocus: false,
         });
-        this.calculateAndDisplayRoute(circle.getCenter(), this.center, this.directionsService, this.directionsRenderer);
+        this.calculateAndDisplayRoute(circle.getCenter(), this.myLocationMarker, this.directionsService, this.directionsRenderer);
       });
-    });
-  }
-
-  placeMarker(latLng: google.maps.LatLng, map: google.maps.Map) {
-
-    
-
-    let marker = new google.maps.Marker({
-      position: latLng,
-      map,
-      draggable: true,
-      animation: google.maps.Animation.DROP,
-      icon: this.icons['blood'].icon,
-    });
-
-    marker.addListener("click", (e:any) => {
-      this.bloodNeededInfoWindow.open({
-        anchor: marker,
-        map,
-        shouldFocus: false,
-      });
-      let cent = new google.maps.LatLng(this.center)
-      this.calculateAndDisplayRoute(e.latLng, cent , this.directionsService, this.directionsRenderer);
     });
   }
   
