@@ -1,1 +1,5 @@
 @import '~mdb-ui-kit/css/mdb.min.css';
+
+.acontainer {
+    right: 50px;
+  }

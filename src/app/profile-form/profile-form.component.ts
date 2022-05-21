@@ -123,6 +123,7 @@ export class ProfileFormComponent implements OnInit {
   }
 
   submit():void {
+    console.log(this.BloodTypes)
     console.log(this.userDetailsForm.value)
   }
 
