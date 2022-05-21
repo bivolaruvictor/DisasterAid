@@ -12,14 +12,18 @@ import { NavbarComponent } from './navbar/navbar.component';
 import  {MdbCollapseModule} from 'mdb-angular-ui-kit/collapse'
 import data from '../../auth_config.json';
 import { MapComponent } from './map/map.component';
-
+import { ProfileFormComponent } from './profile-form/profile-form.component';
+import { MatFormFieldModule, } from "@angular/material/form-field";
+import { MatInputModule } from '@angular/material/input';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 @NgModule({
   declarations: [
     AppComponent,
     AppAuthButtonComponent,
     UserProfileComponent,
     NavbarComponent,
-    MapComponent 
+    MapComponent,
+    ProfileFormComponent 
   ],
   imports: [
     BrowserModule,
@@ -31,8 +35,15 @@ import { MapComponent } from './map/map.component';
       cacheLocation: 'localstorage'
     }),
     BrowserAnimationsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
+  exports: [MatInputModule],
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  
+ }

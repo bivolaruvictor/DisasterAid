@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Loader } from '@googlemaps/js-api-loader';
 import data from '../../../auth_config.json';
-import { collection, addDoc, getDocs, GeoPoint, setDoc, doc, getDoc } from "firebase/firestore"; 
+import { collection, addDoc, getDocs, GeoPoint, setDoc, doc, getDoc } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
@@ -29,43 +29,29 @@ const db = getFirestore(app);
 
 export class MapComponent implements OnInit {
   title = 'map'
-  
+
   icons: Record<string, { icon: string }> = {
     blood: {
       icon: '../../assets/images/blood.png',
-    }};
+    }
+  };
+
+  @Output() geolocation: EventEmitter<string> = new EventEmitter<string>();
 
   directionsRenderer: any
   directionsService: any
   center: any;
-  myLocationMarker:any;
+  myLocationMarker: any;
 
-  currentUser : any;
+  currentUser: any;
 
-  bloodNeededInfoWindow:any;
+  bloodNeededInfoWindow: any;
 
-  fireInfoWindow:any;
+  fireInfoWindow: any;
 
   constructor(public auth: AuthService) { }
 
   async ngOnInit(): Promise<void> {
-
-  //   let position = new GeoPoint(44.439663, 26.096306)
-  //   try {
-  //     const docRef = await addDoc(collection(db, "BloodLocations"), {
-  //       Name: "Ada",
-  //       Position: position,
-  //       Age: 123
-  //     });
-  //     console.log("Document written with ID: ", docRef.id);
-  //   } catch (e) {
-  //     console.error("Error adding document: ", e);
-  //   }
-    
-  //   const querySnapshot = await getDocs(collection(db, "BloodLocations"));
-  //     querySnapshot.forEach((doc: any) => {
-  //     console.log(`${doc.id} => ${doc.data()}`); 
-  // });
 
 
     let loader = new Loader({
@@ -73,27 +59,27 @@ export class MapComponent implements OnInit {
       libraries: ['drawing', 'geometry', 'places', 'visualization']
     })
 
-    this.center = {lat: 44.439663, lng: 26.096306}
+    this.center = { lat: 44.439663, lng: 26.096306 }
 
     let mapElement = document.getElementById("map") as HTMLElement;
 
     
 
-    
+
     const map = await loader.load().then(() => {
       return new google.maps.Map(mapElement, {
-        center: this.center, 
+        center: this.center,
         zoom: 16
       })
     })
 
-    navigator.geolocation.getCurrentPosition((position) => {  
-      this.myLocationMarker = new google.maps.LatLng(position.coords.latitude, 
-                                            position.coords.longitude);
-  
+    navigator.geolocation.getCurrentPosition((position) => {
+      this.myLocationMarker = new google.maps.LatLng(position.coords.latitude,
+        position.coords.longitude);
 
 
-        let newPoint = new google.maps.Marker({
+
+      let newPoint = new google.maps.Marker({
         position: this.myLocationMarker,
         map: map,
         icon: {
@@ -103,15 +89,33 @@ export class MapComponent implements OnInit {
           strokeWeight: 2,
           fillColor: '#5384ED',
           strokeColor: '#ffffff',
-        }});
+        }
+      });
       // Center the map on the new position
       map.setCenter(this.myLocationMarker);
-    }); 
+
+      let geocoder = new google.maps.Geocoder();
+      console.log(this.myLocationMarker)
+      geocoder.geocode({
+        location: this.myLocationMarker
+      }, (results, status) => {
+        console.log(status)
+        if (status == google.maps.GeocoderStatus.OK) {
+          if (results) {
+            this.geolocation.emit(results[0].formatted_address.toString());
+          }
+        }
+      });
+
+    });
+
+
+    
 
     this.bloodNeededInfoWindow = new google.maps.InfoWindow({
       content: 'Blood Donnor Needed',
     });
-  
+
     this.fireInfoWindow = new google.maps.InfoWindow({
       content: 'Caution Fire',
     });
@@ -153,25 +157,26 @@ export class MapComponent implements OnInit {
     this.directionsRenderer.setMap(map);
 
 
-    google.maps.event.addListener(drawingManager, 'markercomplete',  async (marker: any) => {
+    google.maps.event.addListener(drawingManager, 'markercomplete', async (marker: any) => {
       this.auth.getUser().subscribe(
-        async (profile) => { 
+        async (profile) => {
           this.currentUser = profile;
-          
+
           const userRef = doc(db, "users", this.currentUser.email);
           const userDetails = await getDoc(userRef);
-          
+
           let userData = userDetails.data();
 
           //save blood points
           await addDoc(collection(db, "BloodLocations"), {
-            location: [marker.getPosition().lat() , marker.getPosition().lng()],
+            location: [marker.getPosition().lat(), marker.getPosition().lng()],
             bloodType: userData?.bloodType
           });
-            
-          },
-      );   
-      google.maps.event.addListener(marker, 'click', (e:any) => {
+
+        },
+      );
+
+      google.maps.event.addListener(marker, 'click', (e: any) => {
         this.bloodNeededInfoWindow.open({
           anchor: marker,
           map,
@@ -182,8 +187,8 @@ export class MapComponent implements OnInit {
     });
 
 
-    google.maps.event.addListener(drawingManager, 'circlecomplete',  (circle: any) => {
-      google.maps.event.addListener(circle, 'click', (e:any) => {
+    google.maps.event.addListener(drawingManager, 'circlecomplete', (circle: any) => {
+      google.maps.event.addListener(circle, 'click', (e: any) => {
         this.fireInfoWindow.setPosition(circle.getCenter());
         this.fireInfoWindow.open({
           anchor: circle,
@@ -191,19 +196,20 @@ export class MapComponent implements OnInit {
           shouldFocus: false,
         });
         this.calculateAndDisplayRoute(circle.getCenter(), this.myLocationMarker, this.directionsService, this.directionsRenderer);
-      });});
+      });
+    });
 
 
   }
-  
+
 
   calculateAndDisplayRoute(
     destination: google.maps.LatLng,
-    source: google.maps.LatLng, 
+    source: google.maps.LatLng,
     directionsService: google.maps.DirectionsService,
     directionsRenderer: google.maps.DirectionsRenderer
   ) {
-  
+
     directionsService
       .route({
         origin: source, // Haight.

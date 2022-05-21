@@ -5,6 +5,7 @@ import { DOCUMENT } from '@angular/common';
 import { MapComponent } from '../map/map.component';
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import { ProfileFormComponent } from '../profile-form/profile-form.component';
 import data from '../../../auth_config.json';
 
 const firebaseConfig = {
@@ -33,9 +34,12 @@ export class UserProfileComponent implements OnInit{
   email : any;
   phone : any;
   address : any;
+  formOpen: any;
+  userLocation: any;
   
   constructor(@Inject(DOCUMENT) public document: Document, public auth: AuthService) {}
-    ngOnInit(): void {
+  ngOnInit(): void {
+        this.formOpen = false;
         this.auth.getUser().subscribe(
           async (profile) => { 
             this.user = profile;
@@ -57,8 +61,15 @@ export class UserProfileComponent implements OnInit{
             }
           },
         );
-    }
+  }
+
+  openProfileForm(): void {
+    this.formOpen = true;
+  }
   
+  updateLocation(location: string): void {
+    this.userLocation = location
+  }
 }
 
 

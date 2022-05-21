@@ -1,0 +1,17 @@
+@import url('https://unpkg.com/bootstrap@3.3.7/dist/css/bootstrap.min.css'); */
+
+    .mat-input-element {
+        color: slategray;
+    }
+    .mat-form-field-label {
+        color: slategray;
+    }
+    .mat-form-field-underline {
+        background-color: slategray;
+    }
+    .mat-form-field-ripple {
+        background-color: slategray;
+    }
+    .mat-form-field-required-marker {
+        color: slategray;
+    }

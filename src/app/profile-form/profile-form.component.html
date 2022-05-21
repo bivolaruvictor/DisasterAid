@@ -1,0 +1,39 @@
+
+<img class="img-fluid" width="300" height="300"alt="Responsive image" src={{this.userDetailsForm.value.photoURL}}/>
+<form name="detailsForm" [formGroup]="userDetailsForm">
+    
+    <div class="form-group">
+        <input type="file">
+    </div>
+    
+    <div class="form-group">
+        <input class="form-control form-control-lg" formControlName="fullname" [readonly]="true" >
+    </div>
+
+    <div class="form-group">
+        <input class="form-control form-control-lg"  formControlName="email" [readonly]="true" >
+    </div>
+
+    <div class="form-group">
+        <input matInput class="form-control form-control-lg" placeholder="Address" formControlName="address" >
+    </div>
+
+    <div class="form-group">
+        <select class="form-control form-control-lg" formControlName="bloodtypes" (change)="changeBloodType($event)">
+            <option disabled>Choose Blood Type</option>
+            <option *ngFor="let bloodtype of BloodTypes">
+            {{bloodtype}}
+            </option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <input matInput class="form-control form-control-lg"  placeholder="Phone Number" formControlName="phone">
+    </div>
+    <div flex layout="row" layout-align="end center" class="fullWidth pad-right-sm">
+        <button type="submit" class="btn btn-primary" (click)="submit()">Submit Changes</button>
+    </div>
+</form>
+
+
+
