@@ -95,11 +95,9 @@ export class MapComponent implements OnInit {
       map.setCenter(this.myLocationMarker);
 
       let geocoder = new google.maps.Geocoder();
-      console.log(this.myLocationMarker)
       geocoder.geocode({
         location: this.myLocationMarker
       }, (results, status) => {
-        console.log(status)
         if (status == google.maps.GeocoderStatus.OK) {
           if (results) {
             this.geolocation.emit(results[0].formatted_address.toString());
@@ -221,7 +219,6 @@ export class MapComponent implements OnInit {
       })
       .then((response) => {
         directionsRenderer.setDirections(response);
-        console.log(response)
       })
       .catch((e) => window.alert("Directions request failed due to " + status));
   }

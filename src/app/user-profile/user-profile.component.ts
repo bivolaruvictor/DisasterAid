@@ -47,7 +47,6 @@ export class UserProfileComponent implements OnInit{
             const docSnap = await getDoc(docRef);
             
              if(docSnap.exists()) {
-              console.log("l am gasit")
             } else {
               await setDoc(doc(db,"users", this.user.email), {
                 email: this.user.email,
@@ -57,7 +56,6 @@ export class UserProfileComponent implements OnInit{
                 phone : "blank",
                 address : "blank"
               });
-              console.log("mai incearca")
             }
           },
         );

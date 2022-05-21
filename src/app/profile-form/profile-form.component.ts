@@ -95,12 +95,10 @@ export class ProfileFormComponent implements OnInit {
   
 
   ngOnInit(): void {
-    console.log(this.userLocation)
     this.userDetailsForm.patchValue({photoURL: "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"})
     this.auth.getUser().subscribe(
       async (profile) => { 
         this.user = profile;
-        console.log(profile)
         const docRef = doc(db, "users", this.user.email); 
         const docSnap = await getDoc(docRef);
         
