@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
 import { Auth0Client } from '@auth0/auth0-spa-js';
 import { DOCUMENT } from '@angular/common';
@@ -30,6 +30,7 @@ const db = getFirestore(app);
 })
 export class ProfileFormComponent implements OnInit {
 
+  
   profile: any;
   name : any;
   username : any;
@@ -89,7 +90,12 @@ export class ProfileFormComponent implements OnInit {
     });
   }
 
+  @Input()
+  userLocation!: string;
+  
+
   ngOnInit(): void {
+    console.log(this.userLocation)
     this.userDetailsForm.patchValue({photoURL: "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"})
     this.auth.getUser().subscribe(
       async (profile) => { 
@@ -101,7 +107,8 @@ export class ProfileFormComponent implements OnInit {
          if(docSnap.exists()) {
           this.userDetailsForm.patchValue({
             email: this.user.email,
-            fullname: this.user.nickname
+            fullname: this.user.nickname,
+            address : this.userLocation
           })
         } else {
           await setDoc(doc(db,"users", this.user.email), {
