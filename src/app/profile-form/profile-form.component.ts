@@ -1,4 +1,4 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit, Output, EventEmitter} from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
 import { Auth0Client } from '@auth0/auth0-spa-js';
 import { DOCUMENT } from '@angular/common';
@@ -30,7 +30,8 @@ const db = getFirestore(app);
 })
 export class ProfileFormComponent implements OnInit {
 
-  
+  @Output() closeForm : EventEmitter<boolean> = new EventEmitter<boolean>();
+
   profile: any;
   name : any;
   username : any;
@@ -104,9 +105,11 @@ export class ProfileFormComponent implements OnInit {
         
          if(docSnap.exists()) {
           this.userDetailsForm.patchValue({
-            email: this.user.email,
-            fullname: this.user.nickname,
-            address : this.userLocation
+            email: docSnap.data().email,
+            fullname: docSnap.data().name,
+            address :  docSnap.data().address,
+            phone : docSnap.data().phone,
+            bloodType: docSnap.data().bloodType
           })
         }
       },
@@ -123,6 +126,8 @@ export class ProfileFormComponent implements OnInit {
       phone : this.userDetailsForm.value.phone,
       address : this.userDetailsForm.value.address
     });
+
+    this.closeForm.emit(true);
   }
 
 }

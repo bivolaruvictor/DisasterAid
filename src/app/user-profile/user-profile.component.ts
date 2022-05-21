@@ -47,6 +47,11 @@ export class UserProfileComponent implements OnInit{
             const docSnap = await getDoc(docRef);
             
              if(docSnap.exists()) {
+                this.email = docSnap.data().email,
+                this.name = docSnap.data().name,
+                this.address = docSnap.data().address,
+                this.phone = docSnap.data().phone,
+                this.bloodType = docSnap.data().bloodType
             } else {
               await setDoc(doc(db,"users", this.user.email), {
                 email: this.user.email,
@@ -63,6 +68,10 @@ export class UserProfileComponent implements OnInit{
 
   openProfileForm(): void {
     this.formOpen = true;
+  }
+
+  updateForm(val : boolean): void {
+    this.formOpen = !this.formOpen;
   }
   
   updateLocation(location: string): void {
