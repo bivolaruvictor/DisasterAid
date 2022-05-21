@@ -4,7 +4,7 @@ import { Auth0Client } from '@auth0/auth0-spa-js';
 import { DOCUMENT } from '@angular/common';
 import { MapComponent } from '../map/map.component';
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import data from '../../../auth_config.json';
 import { Validators, FormBuilder, FormGroup, FormControl, FormArray } from '@angular/forms';
 
@@ -81,7 +81,7 @@ export class ProfileFormComponent implements OnInit {
 
   constructor(@Inject(DOCUMENT) public document: Document, public auth: AuthService) {
     this.userDetailsForm = new FormGroup({
-      bloodtypes: new FormControl(''),
+      bloodtypes: new FormControl('', Validators.required),
       fullname: new FormControl(''),
       email: new FormControl(''),
       phone: new FormControl(''),
@@ -108,23 +108,21 @@ export class ProfileFormComponent implements OnInit {
             fullname: this.user.nickname,
             address : this.userLocation
           })
-        } else {
-          await setDoc(doc(db,"users", this.user.email), {
-            email: this.user.email,
-            name: this.user.name,
-            username: "blank",
-            bloodType: "blank",
-            phone : "blank",
-            address : "blank"
-          });
         }
       },
     );
   }
 
-  submit():void {
-    console.log(this.BloodTypes)
-    console.log(this.userDetailsForm.value)
+  async submit():Promise<void> {
+    //console.log(this.userDetailsForm.value)
+    const docRef = doc(db, 'users', this.userDetailsForm.value.email);
+    await updateDoc(docRef, {
+      email: this.userDetailsForm.value.email,
+      name: this.userDetailsForm.value.fullname,
+      bloodType: this.userDetailsForm.value.bloodtypes,
+      phone : this.userDetailsForm.value.phone,
+      address : this.userDetailsForm.value.address
+    });
   }
 
 }

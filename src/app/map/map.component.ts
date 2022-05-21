@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Loader } from '@googlemaps/js-api-loader';
 import data from '../../../auth_config.json';
-import { collection, addDoc, getDocs, GeoPoint, setDoc, doc, getDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, GeoPoint, setDoc, doc, getDoc, collectionGroup, query, where } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
@@ -107,12 +107,43 @@ export class MapComponent implements OnInit {
 
     });
 
+    const querySnapshot = await getDocs(collection(db, 'BloodLocations'));
+    querySnapshot.forEach((doc) => {
+      console.log(doc.id, " => ", doc.data());
+      let position = new google.maps.LatLng(parseFloat(doc.data().location[0]),
+      parseFloat(doc.data().location[1]));
+
+      const marker = new google.maps.Marker({
+        position: position,
+        map: map,
+        icon: this.icons['blood'].icon,
+      });
+
+      marker.addListener('click', async (e: any) => {
+        const q = query(collection(db, "BloodLocations"), where("location", "==", [doc.data().location[0], doc.data().location[1]]));
+        const querySnapshot = await getDocs(q);
+        let username = '';
+        let bloodtype = '';
+        querySnapshot.forEach((doc) => {
+          console.log(doc.id, " => ", doc.data());
+          bloodtype = doc.data().bloodType;
+          username = doc.data().username;
+        });
+        this.bloodNeededInfoWindow = new google.maps.InfoWindow({
+          content: '<p>' + 'Blood Donnor Needed' + '</p>' + '<br/>' + '<p>' + username + ' needs blood type ' + bloodtype + '</p>',
+        });
+  
+        this.bloodNeededInfoWindow.open({
+          anchor: marker,
+          map,
+          shouldFocus: false
+        });
+        this.calculateAndDisplayRoute(e.latLng, this.myLocationMarker, this.directionsService, this.directionsRenderer);
+      });
+    }); 
+
 
     
-
-    this.bloodNeededInfoWindow = new google.maps.InfoWindow({
-      content: 'Blood Donnor Needed',
-    });
 
     this.fireInfoWindow = new google.maps.InfoWindow({
       content: 'Caution Fire',
@@ -168,20 +199,35 @@ export class MapComponent implements OnInit {
           //save blood points
           await addDoc(collection(db, "BloodLocations"), {
             location: [marker.getPosition().lat(), marker.getPosition().lng()],
-            bloodType: userData?.bloodType
+            bloodType: userData?.bloodType,
+            username: userData?.username
           });
-
         },
-      );
+        );
+       
 
-      google.maps.event.addListener(marker, 'click', (e: any) => {
+      google.maps.event.addListener(marker, 'click', async (e: any) => {
+        const q = query(collection(db, "BloodLocations"), where("location", "==", [marker.getPosition().lat(), marker.getPosition().lng()]));
+        const querySnapshot = await getDocs(q);
+        let username = '';
+        let bloodtype = '';
+        querySnapshot.forEach((doc) => {
+          console.log(doc.id, " => ", doc.data());
+          bloodtype = doc.data().bloodType;
+          username = doc.data().username;
+        });
+        this.bloodNeededInfoWindow = new google.maps.InfoWindow({
+          content: '<p>' + 'Blood Donnor Needed' + '</p>' + '<br/>' + '<p>' + username + ' needs blood type ' + bloodtype + '</p>',
+        });
+
         this.bloodNeededInfoWindow.open({
           anchor: marker,
           map,
-          shouldFocus: false,
+          shouldFocus: false
         });
         this.calculateAndDisplayRoute(e.latLng, this.myLocationMarker, this.directionsService, this.directionsRenderer);
       });
+    
     });
 
 
