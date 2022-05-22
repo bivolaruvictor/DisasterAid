@@ -249,8 +249,8 @@ export class MapComponent implements OnInit {
           lng = marker.getPosition().lng()
           let markerLatLng = {  lat, lng };
 
-          if (google.maps.geometry.spherical.computeDistanceBetween(userLatLng, markerLatLng) <= 10) {
-            alert('New Blood needed');
+          if (google.maps.geometry.spherical.computeDistanceBetween(userLatLng, markerLatLng) <= 1000) {
+            alert('New Blood needed of type ' + doc.data().bloodType + ' nearby');
           }
         });
         }
