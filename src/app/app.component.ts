@@ -33,7 +33,6 @@ export class AppComponent {
   constructor(@Inject(DOCUMENT) public document: Document, public auth: AuthService) {}
 
   scrollToElement($element: any): void {
-    console.log($element);
     $element.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
   }
 }

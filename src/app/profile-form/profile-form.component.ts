@@ -117,7 +117,6 @@ export class ProfileFormComponent implements OnInit {
   }
 
   async submit():Promise<void> {
-    //console.log(this.userDetailsForm.value)
     const docRef = doc(db, 'users', this.userDetailsForm.value.email);
     await updateDoc(docRef, {
       email: this.userDetailsForm.value.email,

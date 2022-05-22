@@ -112,7 +112,6 @@ export class MapComponent implements OnInit {
 
     let querySnapshot = await getDocs(collection(db, 'BloodLocations'));
     querySnapshot.forEach((doc) => {
-      console.log(doc.id, " => ", doc.data());
       let position = new google.maps.LatLng(parseFloat(doc.data().location[0]),
       parseFloat(doc.data().location[1]));
 
@@ -121,6 +120,8 @@ export class MapComponent implements OnInit {
         map: map,
         icon: this.icons['blood'].icon,
       });
+
+      
 
       marker.addListener('click', async (e: any) => {
         const q = query(collection(db, "BloodLocations"), where("location", "==", [doc.data().location[0], doc.data().location[1]]));
@@ -149,7 +150,6 @@ export class MapComponent implements OnInit {
 
     querySnapshot = await getDocs(collection(db, 'FireZones'));
     querySnapshot.forEach((doc) => {
-      console.log(doc.id, " => ", doc.data());
       let position = new google.maps.LatLng(parseFloat(doc.data().location[0]),
       parseFloat(doc.data().location[1]));
       let radius = parseFloat(doc.data().radius);
@@ -172,12 +172,10 @@ export class MapComponent implements OnInit {
         let username = '';
         let timestamp = '';
         querySnapshot.forEach((doc) => {
-          console.log(doc.id, " => ", doc.data());
           username = doc.data().username;
           timestamp = doc.data().timestamp;
         });
 
-        console.log(username);
         this.fireInfoWindow = new google.maps.InfoWindow({
           content:'<p>' + 'Caution Fire' + '</p>' + '<br/>' + '<p>' + 'Reported by ' + username + ' at ' + timestamp + '</p>',
         });
@@ -241,7 +239,6 @@ export class MapComponent implements OnInit {
       let querySnapshot = await getDocs(collection(db, 'users'));
       querySnapshot.forEach((doc) => {
         let addr = doc.data().address.toString()
-        console.log(addr)
         let geoLoc = new google.maps.Geocoder();
         geoLoc.geocode({'address' : addr}).then((responses) => {
           let lat = responses.results[0].geometry.location.lat()
@@ -252,7 +249,7 @@ export class MapComponent implements OnInit {
           lng = marker.getPosition().lng()
           let markerLatLng = {  lat, lng };
 
-          if (google.maps.geometry.spherical.computeDistanceBetween(userLatLng, markerLatLng) <= 50) {
+          if (google.maps.geometry.spherical.computeDistanceBetween(userLatLng, markerLatLng) <= 10000) {
             alert('New Blood needed');
           }
         });
@@ -288,7 +285,6 @@ export class MapComponent implements OnInit {
         let timestamp = '';
 
         querySnapshot.forEach((doc) => {
-          console.log(doc.id, " => ", doc.data());
           bloodtype = doc.data().bloodType;
           username = doc.data().username;
           timestamp = doc.data().timestamp;
@@ -338,7 +334,6 @@ export class MapComponent implements OnInit {
         let timestamp = '';
 
         querySnapshot.forEach((doc) => {
-          console.log(doc.id, " => ", doc.data());
           username = doc.data().username;
           timestamp = doc.data().timestamp;
         });
