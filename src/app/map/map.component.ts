@@ -107,7 +107,7 @@ export class MapComponent implements OnInit {
 
     });
 
-    const querySnapshot = await getDocs(collection(db, 'BloodLocations'));
+    let querySnapshot = await getDocs(collection(db, 'BloodLocations'));
     querySnapshot.forEach((doc) => {
       console.log(doc.id, " => ", doc.data());
       let position = new google.maps.LatLng(parseFloat(doc.data().location[0]),
@@ -124,13 +124,15 @@ export class MapComponent implements OnInit {
         const querySnapshot = await getDocs(q);
         let username = '';
         let bloodtype = '';
+        let timestamp = '';
         querySnapshot.forEach((doc) => {
           console.log(doc.id, " => ", doc.data());
           bloodtype = doc.data().bloodType;
           username = doc.data().username;
+          timestamp = doc.data().timestamp;
         });
         this.bloodNeededInfoWindow = new google.maps.InfoWindow({
-          content: '<p>' + 'Blood Donnor Needed' + '</p>' + '<br/>' + '<p>' + username + ' needs blood type ' + bloodtype + '</p>',
+          content: '<p>' + 'Blood Donnor Needed' + '</p>' + '<br/>' + '<p>' + username + ' needs blood type ' + bloodtype + '</p>' + '<br/>' + '<p>' + 'Requested at ' + timestamp + '</p>',
         });
   
         this.bloodNeededInfoWindow.open({
@@ -142,12 +144,54 @@ export class MapComponent implements OnInit {
       });
     }); 
 
+    querySnapshot = await getDocs(collection(db, 'FireZones'));
+    querySnapshot.forEach((doc) => {
+      console.log(doc.id, " => ", doc.data());
+      let position = new google.maps.LatLng(parseFloat(doc.data().location[0]),
+      parseFloat(doc.data().location[1]));
+      let radius = parseFloat(doc.data().radius);
 
+      const circle = new google.maps.Circle({
+        center: position,
+        map: map,
+        strokeColor: "#FF0000",
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: "#FF0000",
+        fillOpacity: 0.35,
+        radius: radius,
+        clickable: true
+      });
+
+      circle.addListener('click', async (e: any) => {
+        const q = query(collection(db, "FireZones"), where("location", "==", [doc.data().location[0], doc.data().location[1]]));
+        const querySnapshot = await getDocs(q);
+        let username = '';
+        let timestamp = '';
+        querySnapshot.forEach((doc) => {
+          console.log(doc.id, " => ", doc.data());
+          username = doc.data().username;
+          timestamp = doc.data().timestamp;
+        });
+
+        console.log(username);
+        this.fireInfoWindow = new google.maps.InfoWindow({
+          content:'<p>' + 'Caution Fire' + '</p>' + '<br/>' + '<p>' + 'Reported by ' + username + ' at ' + timestamp + '</p>',
+        });
+
+        this.fireInfoWindow.setPosition(position);
+        
+        this.fireInfoWindow.open({
+          anchor: circle,
+          map,
+          shouldFocus: false,
+        });
+        this.calculateAndDisplayRoute(position, this.myLocationMarker, this.directionsService, this.directionsRenderer);
+      });
+    }); 
     
 
-    this.fireInfoWindow = new google.maps.InfoWindow({
-      content: 'Caution Fire',
-    });
+    
 
     this.directionsRenderer = new google.maps.DirectionsRenderer();
     this.directionsService = new google.maps.DirectionsService();
@@ -200,7 +244,8 @@ export class MapComponent implements OnInit {
           await addDoc(collection(db, "BloodLocations"), {
             location: [marker.getPosition().lat(), marker.getPosition().lng()],
             bloodType: userData?.bloodType,
-            username: userData?.username
+            username: userData?.username,
+            timestamp: this.getCurrentTime()
           });
         },
         );
@@ -211,13 +256,16 @@ export class MapComponent implements OnInit {
         const querySnapshot = await getDocs(q);
         let username = '';
         let bloodtype = '';
+        let timestamp = '';
+
         querySnapshot.forEach((doc) => {
           console.log(doc.id, " => ", doc.data());
           bloodtype = doc.data().bloodType;
           username = doc.data().username;
+          timestamp = doc.data().timestamp;
         });
         this.bloodNeededInfoWindow = new google.maps.InfoWindow({
-          content: '<p>' + 'Blood Donnor Needed' + '</p>' + '<br/>' + '<p>' + username + ' needs blood type ' + bloodtype + '</p>',
+          content: '<p>' + 'Blood Donnor Needed' + '</p>' + '<br/>' + '<p>' + username + ' needs blood type ' + bloodtype + '</p>' + '<br/>' + '<p>' + 'Requested at ' + timestamp + '</p>',
         });
 
         this.bloodNeededInfoWindow.open({
@@ -232,8 +280,43 @@ export class MapComponent implements OnInit {
 
 
     google.maps.event.addListener(drawingManager, 'circlecomplete', (circle: any) => {
-      google.maps.event.addListener(circle, 'click', (e: any) => {
+      this.auth.getUser().subscribe(
+        async (profile) => {
+          this.currentUser = profile;
+
+          const userRef = doc(db, "users", this.currentUser.email);
+          const userDetails = await getDoc(userRef);
+
+          let userData = userDetails.data();
+
+          //save fire zone
+          await addDoc(collection(db, "FireZones"), {
+            radius: circle.getRadius(),
+            location: [circle.getCenter().lat(), circle.getCenter().lng()],
+            username: userData?.username,
+            timestamp: this.getCurrentTime()
+          });
+        },
+        );
+
+      google.maps.event.addListener(circle, 'click', async (e: any) => {
+        const q = query(collection(db, "FireZones"), where("location", "==", [circle.getCenter().lat(), circle.getCenter().lng()]));
+        const querySnapshot = await getDocs(q);
+        let username = '';
+        let timestamp = '';
+
+        querySnapshot.forEach((doc) => {
+          console.log(doc.id, " => ", doc.data());
+          username = doc.data().username;
+          timestamp = doc.data().timestamp;
+        });
+
+        this.fireInfoWindow = new google.maps.InfoWindow({
+          content:'<p>' + 'Caution Fire' + '</p>' + '<br/>' + '<p>' + 'Reported by ' + username + ' at ' + timestamp + '</p>',
+        });
+
         this.fireInfoWindow.setPosition(circle.getCenter());
+        
         this.fireInfoWindow.open({
           anchor: circle,
           map,
@@ -267,6 +350,14 @@ export class MapComponent implements OnInit {
         directionsRenderer.setDirections(response);
       })
       .catch((e) => window.alert("Directions request failed due to " + status));
+  }
+
+  getCurrentTime() : string{
+    let today = new Date();
+    let hours = (today.getHours() < 10 ? '0' : '') + today.getHours();
+    let minutes = (today.getMinutes() < 10 ? '0' : '') + today.getMinutes();
+    let seconds = (today.getSeconds() < 10 ? '0' : '') + today.getSeconds();
+    return hours + ':' + minutes + ':' + seconds;
   }
 }
 
