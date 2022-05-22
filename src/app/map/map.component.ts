@@ -111,15 +111,36 @@ export class MapComponent implements OnInit {
     });
 
     let querySnapshot = await getDocs(collection(db, 'BloodLocations'));
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach(async (doc) => {
       let position = new google.maps.LatLng(parseFloat(doc.data().location[0]),
       parseFloat(doc.data().location[1]));
 
-      const marker = new google.maps.Marker({
+      let marker = new google.maps.Marker({
         position: position,
         map: map,
         icon: this.icons['blood'].icon,
       });
+
+      // Notify all Users
+      let querySnapshot = await getDocs(collection(db, 'users'));
+      querySnapshot.forEach((doc) => {
+        let addr = doc.data().address.toString()
+        let geoLoc = new google.maps.Geocoder();
+        geoLoc.geocode({'address' : addr}).then((responses) => {
+          let lat = responses.results[0].geometry.location.lat()
+          let lng = responses.results[0].geometry.location.lng()
+          let userLatLng = {  lat, lng };
+          
+          lat = position.lat()
+          lng = position.lng()
+          let markerLatLng = {  lat, lng };
+
+          if (google.maps.geometry.spherical.computeDistanceBetween(userLatLng, markerLatLng) <= 1000) {
+            alert('New Blood needed of type ' + doc.data().bloodType + ' nearby');
+          }
+        });
+        }
+      );
 
       
 
@@ -149,7 +170,7 @@ export class MapComponent implements OnInit {
     }); 
 
     querySnapshot = await getDocs(collection(db, 'FireZones'));
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach(async (doc) => {
       let position = new google.maps.LatLng(parseFloat(doc.data().location[0]),
       parseFloat(doc.data().location[1]));
       let radius = parseFloat(doc.data().radius);
@@ -166,6 +187,27 @@ export class MapComponent implements OnInit {
         clickable: true
       });
 
+      // Notify all Users
+      let querySnapshot = await getDocs(collection(db, 'users'));
+      querySnapshot.forEach((doc) => {
+        let addr = doc.data().address.toString()
+        let geoLoc = new google.maps.Geocoder();
+        geoLoc.geocode({'address' : addr}).then((responses) => {
+          let lat = responses.results[0].geometry.location.lat()
+          let lng = responses.results[0].geometry.location.lng()
+          let userLatLng = {  lat, lng };
+
+          lat = position.lat()
+          lng = position.lng()
+          let markerLatLng = {  lat, lng };
+
+          if (google.maps.geometry.spherical.computeDistanceBetween(userLatLng, markerLatLng) <= 1000) {
+            alert('New Fire reported nearby by ' + doc.data().username );
+          }
+        });
+        }
+      );
+      
       circle.addListener('click', async (e: any) => {
         const q = query(collection(db, "FireZones"), where("location", "==", [doc.data().location[0], doc.data().location[1]]));
         const querySnapshot = await getDocs(q);
@@ -235,26 +277,7 @@ export class MapComponent implements OnInit {
       let message = 'Blood Needed';
       this.smq.publish('alert',message);
 
-      // Notify all Users
-      let querySnapshot = await getDocs(collection(db, 'users'));
-      querySnapshot.forEach((doc) => {
-        let addr = doc.data().address.toString()
-        let geoLoc = new google.maps.Geocoder();
-        geoLoc.geocode({'address' : addr}).then((responses) => {
-          let lat = responses.results[0].geometry.location.lat()
-          let lng = responses.results[0].geometry.location.lng()
-          let userLatLng = {  lat, lng };
-
-          lat = marker.getPosition().lat()
-          lng = marker.getPosition().lng()
-          let markerLatLng = {  lat, lng };
-
-          if (google.maps.geometry.spherical.computeDistanceBetween(userLatLng, markerLatLng) <= 1000) {
-            alert('New Blood needed of type ' + doc.data().bloodType + ' nearby');
-          }
-        });
-        }
-      );
+      
 
       this.auth.getUser().subscribe(
         async (profile) => {
@@ -309,26 +332,7 @@ export class MapComponent implements OnInit {
       let message = 'Fire reported';
       this.smq.publish('alert',message);
 
-      // Notify all Users
-      let querySnapshot = await getDocs(collection(db, 'users'));
-      querySnapshot.forEach((doc) => {
-        let addr = doc.data().address.toString()
-        let geoLoc = new google.maps.Geocoder();
-        geoLoc.geocode({'address' : addr}).then((responses) => {
-          let lat = responses.results[0].geometry.location.lat()
-          let lng = responses.results[0].geometry.location.lng()
-          let userLatLng = {  lat, lng };
-
-          lat = circle.getCenter().lat()
-          lng = circle.getCenter().lng()
-          let markerLatLng = {  lat, lng };
-
-          if (google.maps.geometry.spherical.computeDistanceBetween(userLatLng, markerLatLng) <= 1000) {
-            alert('New Fire reported nearby by ' + doc.data().username );
-          }
-        });
-        }
-      );
+      
       this.auth.getUser().subscribe(
         async (profile) => {
           this.currentUser = profile;
