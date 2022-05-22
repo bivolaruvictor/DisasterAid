@@ -25,6 +25,7 @@
     "@ngtools/webpack": "^1.2.4",
     "firebase": "^9.8.1",
     "mdb-angular-ui-kit": "^2.2.0",
+    "ng2-simple-mq": "^11.2.9",
     "rxjs": "~6.6.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"

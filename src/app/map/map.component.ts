@@ -6,6 +6,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 import { AuthService } from '@auth0/auth0-angular';
+import { SimpleMQ } from 'ng2-simple-mq';
 
 const firebaseConfig = {
   apiKey: data.apiKey,
@@ -49,10 +50,12 @@ export class MapComponent implements OnInit {
 
   fireInfoWindow: any;
 
-  constructor(public auth: AuthService) { }
+  constructor(public auth: AuthService, private smq: SimpleMQ) { }
 
   async ngOnInit(): Promise<void> {
+    this.smq.newQueue('broadcast');
 
+    
 
     let loader = new Loader({
       apiKey: data.APIKEY,
@@ -231,6 +234,8 @@ export class MapComponent implements OnInit {
 
 
     google.maps.event.addListener(drawingManager, 'markercomplete', async (marker: any) => {
+      let message = 'Blood Needed';
+        this.smq.publish('broadcast',message);
       this.auth.getUser().subscribe(
         async (profile) => {
           this.currentUser = profile;
@@ -252,6 +257,7 @@ export class MapComponent implements OnInit {
        
 
       google.maps.event.addListener(marker, 'click', async (e: any) => {
+        
         const q = query(collection(db, "BloodLocations"), where("location", "==", [marker.getPosition().lat(), marker.getPosition().lng()]));
         const querySnapshot = await getDocs(q);
         let username = '';
@@ -280,6 +286,9 @@ export class MapComponent implements OnInit {
 
 
     google.maps.event.addListener(drawingManager, 'circlecomplete', (circle: any) => {
+      
+      let message = 'Fire reported';
+      this.smq.publish('broadcast',message);
       this.auth.getUser().subscribe(
         async (profile) => {
           this.currentUser = profile;

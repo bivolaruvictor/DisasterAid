@@ -7,6 +7,7 @@ import { initializeApp } from "firebase/app";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 import { ProfileFormComponent } from '../profile-form/profile-form.component';
 import data from '../../../auth_config.json';
+import { SimpleMQ } from 'ng2-simple-mq';
 
 const firebaseConfig = {
   apiKey: data.apiKey,
@@ -36,9 +37,13 @@ export class UserProfileComponent implements OnInit{
   address : any;
   formOpen: any;
   userLocation: any;
+  broadcastMsg: any;
   
-  constructor(@Inject(DOCUMENT) public document: Document, public auth: AuthService) {}
+  constructor(@Inject(DOCUMENT) public document: Document, public auth: AuthService, private smq: SimpleMQ) {}
   ngOnInit(): void {
+
+    this.smq.subscribe('broadcast', e => this.receiveBroadcast(e));
+    
         this.formOpen = false;
         this.auth.getUser().subscribe(
           async (profile) => { 
@@ -77,6 +82,11 @@ export class UserProfileComponent implements OnInit{
   
   updateLocation(location: string): void {
     this.userLocation = location
+  }
+
+  receiveBroadcast(m: any) {
+    this.broadcastMsg = m;
+    console.log(m)
   }
 }
 

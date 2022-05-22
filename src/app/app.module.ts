@@ -17,6 +17,7 @@ import { MatFormFieldModule, } from "@angular/material/form-field";
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {MatSelectModule} from '@angular/material/select';
+import { SimpleMQ } from 'ng2-simple-mq';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,7 @@ import {MatSelectModule} from '@angular/material/select';
     MatSelectModule
   ],
   exports: [MatInputModule],
-  providers: [],
+  providers: [ SimpleMQ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
