@@ -72,6 +72,7 @@ export class UserProfileComponent implements OnInit{
 
   updateForm(val : boolean): void {
     this.formOpen = !this.formOpen;
+    window.location.reload()
   }
   
   updateLocation(location: string): void {

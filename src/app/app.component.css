@@ -11,10 +11,15 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1,
-h2,
-h3 {
+h1 {
   color: white;
+  line-height: 1;
+}
+h2 {
+  color: white;
+}
+h3 {
+  color: #22105f;
   margin: 8px 0;
 }
 
@@ -59,7 +64,12 @@ color: #00a7f5;
 :focus {
 outline: 0 !important;
 }
-h1, h2, h3 {
+
+.section-title .h2 {
+  color: #22105f
+}
+
+h1{
 color: #22105f;
 font-family: 'Dosis', sans-serif;
 font-weight: 700;
