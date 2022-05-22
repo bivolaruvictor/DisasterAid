@@ -53,7 +53,7 @@ export class MapComponent implements OnInit {
   constructor(public auth: AuthService, private smq: SimpleMQ) { }
 
   async ngOnInit(): Promise<void> {
-    this.smq.newQueue('broadcast');
+    this.smq.newQueue('alert');
 
     
 
@@ -235,7 +235,30 @@ export class MapComponent implements OnInit {
 
     google.maps.event.addListener(drawingManager, 'markercomplete', async (marker: any) => {
       let message = 'Blood Needed';
-        this.smq.publish('broadcast',message);
+      this.smq.publish('alert',message);
+
+      // Notify all Users
+      let querySnapshot = await getDocs(collection(db, 'users'));
+      querySnapshot.forEach((doc) => {
+        let addr = doc.data().address.toString()
+        console.log(addr)
+        let geoLoc = new google.maps.Geocoder();
+        geoLoc.geocode({'address' : addr}).then((responses) => {
+          let lat = responses.results[0].geometry.location.lat()
+          let lng = responses.results[0].geometry.location.lng()
+          let userLatLng = {  lat, lng };
+
+          lat = marker.getPosition().lat()
+          lng = marker.getPosition().lng()
+          let markerLatLng = {  lat, lng };
+
+          if (google.maps.geometry.spherical.computeDistanceBetween(userLatLng, markerLatLng) <= 50) {
+            alert('New Blood needed');
+          }
+        });
+        }
+      );
+
       this.auth.getUser().subscribe(
         async (profile) => {
           this.currentUser = profile;
@@ -288,7 +311,7 @@ export class MapComponent implements OnInit {
     google.maps.event.addListener(drawingManager, 'circlecomplete', (circle: any) => {
       
       let message = 'Fire reported';
-      this.smq.publish('broadcast',message);
+      this.smq.publish('alert',message);
       this.auth.getUser().subscribe(
         async (profile) => {
           this.currentUser = profile;

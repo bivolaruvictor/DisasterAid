@@ -42,7 +42,7 @@ export class UserProfileComponent implements OnInit{
   constructor(@Inject(DOCUMENT) public document: Document, public auth: AuthService, private smq: SimpleMQ) {}
   ngOnInit(): void {
 
-    this.smq.subscribe('broadcast', e => this.receiveBroadcast(e));
+    this.smq.subscribe('alert', e => this.receiveBroadcast(e));
     
         this.formOpen = false;
         this.auth.getUser().subscribe(
