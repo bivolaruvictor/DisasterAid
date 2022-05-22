@@ -304,10 +304,31 @@ export class MapComponent implements OnInit {
     });
 
 
-    google.maps.event.addListener(drawingManager, 'circlecomplete', (circle: any) => {
+    google.maps.event.addListener(drawingManager, 'circlecomplete', async (circle: any) => {
       
       let message = 'Fire reported';
       this.smq.publish('alert',message);
+
+      // Notify all Users
+      let querySnapshot = await getDocs(collection(db, 'users'));
+      querySnapshot.forEach((doc) => {
+        let addr = doc.data().address.toString()
+        let geoLoc = new google.maps.Geocoder();
+        geoLoc.geocode({'address' : addr}).then((responses) => {
+          let lat = responses.results[0].geometry.location.lat()
+          let lng = responses.results[0].geometry.location.lng()
+          let userLatLng = {  lat, lng };
+
+          lat = circle.getCenter().lat()
+          lng = circle.getCenter().lng()
+          let markerLatLng = {  lat, lng };
+
+          if (google.maps.geometry.spherical.computeDistanceBetween(userLatLng, markerLatLng) <= 1000) {
+            alert('New Fire reported nearby by ' + doc.data().username );
+          }
+        });
+        }
+      );
       this.auth.getUser().subscribe(
         async (profile) => {
           this.currentUser = profile;
