@@ -14,7 +14,7 @@
                             <h2>Become a hero by landing a helping hand for those in need! Spot out the fire</h2>
                             
                             <div class="banner-btn">
-                                <a class="default-btn" href="#about">Learn More</a>
+                                <button class="default-btn" (click)="scrollToElement(target)" href="#about">Learn More</button>
                                 <app-auth-button ></app-auth-button>
                             </div>
                         </div>
@@ -67,7 +67,7 @@
   </section>
   
   <section id="about"  class="services-area pt-100 pb-70">
-    <div class="container">
+    <div #target class="container">
         <div class="section-title">
             <h1>Become a part of our growing community</h1>
             <p>Our aiding community is continously growing and every hand on deck means another life saved</p>
