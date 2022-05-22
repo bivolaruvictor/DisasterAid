@@ -249,7 +249,7 @@ export class MapComponent implements OnInit {
           lng = marker.getPosition().lng()
           let markerLatLng = {  lat, lng };
 
-          if (google.maps.geometry.spherical.computeDistanceBetween(userLatLng, markerLatLng) <= 10000) {
+          if (google.maps.geometry.spherical.computeDistanceBetween(userLatLng, markerLatLng) <= 10) {
             alert('New Blood needed');
           }
         });
