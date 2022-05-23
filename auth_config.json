@@ -1,12 +1,3 @@
 {
-    "domain": "dev-f86u9b27.us.auth0.com",
-    "clientId": "P13X9oVqpmM5NT4EjBfAM5zsr7kjRf0t",
-    "APIKEY": "AIzaSyALN7WhGqVNvmM91GlLy7KSXN9ZLWshSHU",
-   "apiKey": "AIzaSyBok7V-562YfgzqCbAClR-aQ_Wf-iTNIXE",
-  "authDomain": "disasteraid-a72fd.firebaseapp.com",
-  "projectId": "disasteraid-a72fd",
-  "storageBucket": "disasteraid-a72fd.appspot.com",
-  "messagingSenderId": "522550781246",
-  "appId": "1:522550781246:web:be5617f4c9593e9176b86f",
-  "measurementId": "G-ZKBHW44HF1"
+    
   }
